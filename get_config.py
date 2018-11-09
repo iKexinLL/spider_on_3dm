@@ -22,7 +22,7 @@ class GetConfig:
     """
 
     def __init__(self):
-        pass
+        print('init')
 
     @classmethod
     def get_config(cls):
@@ -33,13 +33,14 @@ class GetConfig:
         """
 
         ini_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), r'config\config.ini')
-        # ini_path = r'I:\my_python_code\spider_on_gamersky\config\config.ini'
+        # ini_path = r'I:\my_python_spider\spider_on_3dm\config\config.ini'
         config = ConfigParser()
         config.read(ini_path, encoding='utf-8')
 
         d_config = {}
         for config in config.items('configuration'):
             # TODO: 需要确认是否对true值进行转换
+            # 暂时不对true进行转换,均按照str处理
             # d[config[0]] = True if lower(config[1]) == 'true' else config[1]
             d_config[config[0]] = config[1]
 
