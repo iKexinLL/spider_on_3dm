@@ -11,36 +11,40 @@ __desc__ = 获取页面 https://www.3dmgame.com/bagua_65_6/ 上的标题地址
 import requests
 from bs4 import BeautifulSoup
 
+
 from get_config import GetConfig
+from random_sleep_time import RandomSleepTime
 
 
 
 class GetTitleUrls():
     """GetTitleUrls 获取根目录下的标题网址
     """
+
     def __init__(self):
         # self.config = GetConfig.get_config()['root_url'] 
-         # self._max_download_pages = config['max_download_pages']
-        self._config = GetConfig.get_config()
+        # self._max_download_pages = config['max_download_pages']
+        # self.config = GetConfig.get_config()
+        self.sleep_time = RandomSleepTime()
         
-
-    def __get_soup(self, url):
+    def get_soup(self, url):
         """将网站内容转换成BeautifulSoup对象
-        
+
         Returns
         -------
         bs4.BeautifulSoup
             BeautifulSoup对象
         """
-
-        # r = requests.get(self._config['root_url'])
-        r = requests.get(url)
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' +
+                                 'AppleWebKit/537.36 (KHTML, like Gecko) ' + 
+                                 'Chrome/70.0.3538.77 Safari/537.36'}
+        r = requests.get(url, headers=headers)
         r.encoding = 'utf-8'
         soup = BeautifulSoup(r.text, 'lxml')
 
         return soup
 
-    def __get_title_urls(self, soup):
+    def get_title_urls(self, soup):
         """根据soup,找出所需的网址
         
         Parameters
@@ -62,7 +66,7 @@ class GetTitleUrls():
 
         return all_title_urls
 
-    def __get_next_page(self, soup):
+    def get_next_page(self, soup):
         """获取下一页面的网址
         
         Parameters
@@ -76,30 +80,30 @@ class GetTitleUrls():
             下一页的网址
         """
 
-
         next_button = soup.find(class_='next')
 
-        if next_button.a:
-            # 若存在下一页,则返回下一页的网址
-            return next_button.a['href']
+        # 若存在下一页,则返回下一页的网址
+        return next_button.a['href'] if next_button.a else None
 
     def start(self):
-        """调用其它方法,返回所有的title网址
+        """ 仅作测试使用
+        调用其它方法,返回所有的title网址
         
         Returns
         -------
         list
             返回所有的title网址
         """
-
-        url = self._config['root_url']
-        res = []
+        url = GetConfig.get_config()['root_url']
+        temp_res = []
         while url:
-            soup = self.__get_soup(url)
-            res.extend(self.__get_title_urls(soup))
-            url = self.__get_next_page(soup)
+            soup = self.get_soup(url)
+            self.sleep_time.sleep(0)
+            temp_res.extend(self.get_title_urls(soup))
+            url = self.get_next_page(soup)
+            print(url)
 
-        return res
+        return temp_res
                 
 
 if __name__ == '__main__':
