@@ -83,6 +83,7 @@ class GetTitleUrls():
         next_button = soup.find(class_='next')
 
         # 若存在下一页,则返回下一页的网址
+        # 增加判断,防止next_button未None时报错
         if next_button:
             if next_button.a:
                 return next_button.a['href']
