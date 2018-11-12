@@ -41,11 +41,16 @@ class GetPicUrlInPages(GetTitleUrls):
 
         mid_res_d = {}
         # 获取当前soup的页码
-        page_num = soup.find(class_='active').text
+        # 添加判断class_='active',对只有一页的网页进行设定
+        if soup.find(class_='active'):
+            page_num = soup.find(class_='active').text
+        else
+            page_num = '1'
 
         # 获取第一页的整体说明 -> 第一页的第一个P元素
         if page_num == '1':
             mid_res_d['pic_explain'] = ''.join(soup.find('p').text.split()) # 去除\r\n\t等占位符
+            mid_res_d['pic_title'] = ''.join(soup.find('h1',class_='bt').text.split())
         
         # 获取所有图片网址的元素
         # [<img alt="..." src="..."/>]
@@ -85,7 +90,7 @@ class GetPicUrlInPages(GetTitleUrls):
 
         return tag.has_attr('alt')
 
-    def start(self):
+    def start(self, url=r'https://www.3dmgame.com/bagua/525.html'):
         """仅作测试使用
         
         Returns
@@ -94,19 +99,27 @@ class GetPicUrlInPages(GetTitleUrls):
             pic_explain -> title说明
             图片网址 -> 图片说明
         """
-        url = r'https://www.3dmgame.com/bagua/525.html'
+        # url = r'https://www.3dmgame.com/bagua/525.html'
         res_d = {}
 
         while url:
             soup = self.get_soup(url)
             res_d.update(self.get_pic_url_and_info(soup))
-            self.sleep_time.sleep(3)
+            self.sleep_program.sleep(3)
             url = self.get_next_page(soup)
+            break
             
-
         return res_d
 
 
 if __name__ == '__main__':
     tp = GetPicUrlInPages().start()
-    # print(tp)
+    print(tp)
+    # {'https://img.3dmgame.com/uploads/images/news/20181107/1541583036_205040.jpg': 'None_20181112_150124_0', 
+    # 'https://img.3dmgame.com/uploads/images/news/20181107/1541583036_947114.jpg': 'None_20181112_150124_1', 
+    # 'https://img.3dmgame.com/uploads/images/news/20181107/1541583036_163179.jpg': 'None_20181112_150124_2', 
+    # 'https://img.3dmgame.com/uploads/images/news/20181107/1541583037_237890.jpg': 'None_20181112_150124_3', 
+    # 'https://img.3dmgame.com/uploads/images/news/20181107/1541583038_155306.jpg': 'None_20181112_150124_4'}
+    # 'pic_explain': '转眼又到周四了，快来看看新的福利囧图吧！朦朦胧胧的小姐姐就是美，让人心中渴望。
+    # 现在的女装大佬是越来越多了，已经雌雄难辨。劈叉还不忘挑逗
+    # 妹子，你们太过分了。美女老师穿得如此性感诱惑，学生们还有心思上课吗？'
