@@ -25,9 +25,9 @@ class GetTitleUrls():
         # self.config = GetConfig.get_config()['root_url'] 
         # self._max_download_pages = config['max_download_pages']
         # self.config = GetConfig.get_config()
-        self.sleep_time = RandomSleepTime()
+        self.sleep_program = RandomSleepTime()
         
-    def get_soup(self, url):
+    def get_soup(self, url, timeout=10):
         """将网站内容转换成BeautifulSoup对象
 
         Returns
@@ -38,7 +38,7 @@ class GetTitleUrls():
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) ' +
                                  'AppleWebKit/537.36 (KHTML, like Gecko) ' + 
                                  'Chrome/70.0.3538.77 Safari/537.36'}
-        r = requests.get(url, headers=headers)
+        r = requests.get(url, headers=headers, timeout=timeout)
         r.encoding = 'utf-8'
         soup = BeautifulSoup(r.text, 'lxml')
 
@@ -83,7 +83,9 @@ class GetTitleUrls():
         next_button = soup.find(class_='next')
 
         # 若存在下一页,则返回下一页的网址
-        return next_button.a['href'] if next_button.a else None
+        if next_button:
+            if next_button.a:
+                return next_button.a['href']
 
     def start(self):
         """ 仅作测试使用
@@ -98,10 +100,10 @@ class GetTitleUrls():
         temp_res = []
         while url:
             soup = self.get_soup(url)
-            self.sleep_time.sleep(0)
+            self.sleep_program.sleep(0)
             temp_res.extend(self.get_title_urls(soup))
-            url = self.get_next_page(soup)
             print(url)
+            url = self.get_next_page(soup)
 
         return temp_res
                 
@@ -109,3 +111,4 @@ class GetTitleUrls():
 if __name__ == '__main__':
     tp = GetTitleUrls()
     res = tp.start()
+    print(res)
