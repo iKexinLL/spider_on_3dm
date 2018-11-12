@@ -41,10 +41,10 @@ class GetPicUrlInPages(GetTitleUrls):
 
         mid_res_d = {}
         # 获取当前soup的页码
-        # 添加判断class_='active',对只有一页的网页进行设定
+        # 添加判断class_='active',对只有一页的网页进行判断
         if soup.find(class_='active'):
             page_num = soup.find(class_='active').text
-        else
+        else:
             page_num = '1'
 
         # 获取第一页的整体说明 -> 第一页的第一个P元素
@@ -67,8 +67,6 @@ class GetPicUrlInPages(GetTitleUrls):
                     break
             else:
                 img_explain = "None_" + time.strftime('%Y%m%d_%H%M%S') + '_' + str(n)
-                print(img_explain)
-            print(page_num)
 
             mid_res_d[img_ele['src']] = img_explain
 
@@ -90,7 +88,7 @@ class GetPicUrlInPages(GetTitleUrls):
 
         return tag.has_attr('alt')
 
-    def start(self, url=r'https://www.3dmgame.com/bagua/525.html'):
+    def start(self, url=r'https://www.3dmgame.com/bagua/540.html'):
         """仅作测试使用
         
         Returns
@@ -103,11 +101,11 @@ class GetPicUrlInPages(GetTitleUrls):
         res_d = {}
 
         while url:
+            print('url in get_pic_url_in_pages is ' + url)
             soup = self.get_soup(url)
             res_d.update(self.get_pic_url_and_info(soup))
             self.sleep_program.sleep(3)
             url = self.get_next_page(soup)
-            break
             
         return res_d
 
