@@ -190,7 +190,18 @@ class PicFileHandle():
 
     @staticmethod
     def get_downloaded_urls_path():
-        print(PicFileHandle.__root_folder_path)
+        """返回downloaded_urls的路径
+        
+        Returns
+        -------
+        str
+            downloaded_urls的路径
+        """
+
+
+        return PicFileHandle.path_join(
+            PicFileHandle.__root_folder_path, 'downloaded_urls.txt')
+        
 
 
     
