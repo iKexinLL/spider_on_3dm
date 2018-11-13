@@ -185,7 +185,8 @@ class PicFileHandle():
 
         # root_folder_path = PicFileHandle.get_root_folder_path()
         pic_logger_path = PicFileHandle.path_join(
-            PicFileHandle.__root_folder_path, NOW_DATE, 'pic_log_%s.log'%NOW_TIME)
+            PicFileHandle.__root_folder_path, NOW_DATE, 'LOG', 'pic_log_%s.log'%NOW_TIME)
+        PicFileHandle.create_folder(os.path.split(pic_logger_path)[0])
         return pic_logger_path
 
     @staticmethod
@@ -198,15 +199,43 @@ class PicFileHandle():
             downloaded_urls的路径
         """
 
-
         return PicFileHandle.path_join(
             PicFileHandle.__root_folder_path, 'downloaded_urls.txt')
         
 
+    @staticmethod
+    def get_downloaded_urls():
+        """获取已下载的pic地址
+        
+        Returns
+        -------
+        set
+            已下载的pic地址
+        """
 
-    
+        st = set()
+        mid_path = PicFileHandle.get_downloaded_urls_path()
+        PicFileHandle.clear_downloaded_urls()
+
+        with open(mid_path) as f:
+            for i in f.readlines():
+                st.add(''.join(i.split()))
+            return st
+
+    @staticmethod
+    def clear_downloaded_urls():
+        """重置(清空)downloaded_urls.txt
+        
+        """
+
+        mid_path = PicFileHandle.get_downloaded_urls_path()
+        if not PicFileHandle.isfile(mid_path):
+            with open(mid_path, 'w'):
+                pass
 
 
+if __name__ == '__main__':
+    print(PicFileHandle.get_downloaded_urls())
 
 
 
