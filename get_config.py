@@ -22,7 +22,7 @@ class GetConfig:
     """
 
     def __init__(self):
-        print('init')
+        pass
 
     @classmethod
     def get_config(cls):

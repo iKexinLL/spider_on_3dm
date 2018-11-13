@@ -103,7 +103,6 @@ class GetTitleUrls():
             soup = self.get_soup(url)
             self.sleep_program.sleep(0)
             temp_res.extend(self.get_title_urls(soup))
-            print(url)
             url = self.get_next_page(soup)
 
         return temp_res

@@ -16,10 +16,7 @@ import time
 import gevent
 from gevent.queue import Queue #, Empty
 
-
-
 from get_title_urls import GetTitleUrls
-from write_info import my_write
 
 
 
