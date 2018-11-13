@@ -15,13 +15,22 @@ import datetime
 from get_config import GetConfig
 
 NOW_DATE = datetime.datetime.strftime(datetime.datetime.now(), '%Y%m%d')
-NOW_TIME = datetime.datetime.strftime(datetime.datetime.now(), '%Y%m%d%H%M%S')
+NOW_TIME = datetime.datetime.strftime(datetime.datetime.now(), '%Y%m%d_%H%M%S')
 
 class PicFileHandle():
+    """处理此程序中关于路径的类
+    
+    Returns
+    -------
+    None
+        处理此程序中关于路径的类
+    """
+
+    __root_folder_path = GetConfig.get_config()['root_folder_path']
 
     def __init__(self):
         pass
-
+    
     @staticmethod
     def replace_invalid_char(path):
         r"""剔除windows路径或文件上的非法字符
@@ -89,7 +98,6 @@ class PicFileHandle():
             other_paths.append(PicFileHandle.replace_invalid_char(tmp_path))
         return os.path.join(fisrt_path, *other_paths)
 
-
     @staticmethod
     def isfile(path):
         """判断path路径是否为文件
@@ -109,53 +117,84 @@ class PicFileHandle():
         return os.path.isfile(path)
 
     @staticmethod
-    def __get_today_root_folder_path():
-        """获取本次运行的存储文件夹
+    def get_root_folder_path():
+        """返回config中配置的根目录
         
         Returns
         -------
         str
-            本次运行的存储文件夹
+            根目录路径
         """
 
-        mid_path = os.path.join(GetConfig.get_config()['root_folder_path'], NOW_DATE)
-        PicFileHandle.create_folder(mid_path)
-        return mid_path
-
-    @staticmethod
-    def __get_pic_path(pic_name):
-        """获取本次运行的图片存储位置
-        
-        Parameters
-        ----------
-        pic_name : str
-            图片名称
-        
-        Returns
-        -------
-        str
-            本次运行的图片存储位置
-        """
-
-        pic_name = PicFileHandle.replace_invalid_char(pic_name)
-        mid_path = os.path.join(PicFileHandle.__get_today_root_folder_path(), pic_name)
-        # 如果mid_path不是同名文件,则返回路径,否则略过
-        if not PicFileHandle.isfile(mid_path):
-            return mid_path
+        # return GetConfig.get_config()['root_folder_path']
+        return PicFileHandle.__root_folder_path
 
     @staticmethod
     def get_pic_folder_path(pic_title):
-        root_folder_path = GetConfig.get_config()['root_folder_path']
-        pic_folder_path = PicFileHandle.path_join(root_folder_path, NOW_DATE, pic_title)
+        """返回存储pic的文件夹路径
+        
+        Parameters
+        ----------
+        pic_title : str
+            使用pic_title作为文件夹名称
+        
+        Returns
+        -------
+        str
+            存储pic的文件夹路径
+        """
+
+        # root_folder_path = PicFileHandle.get_root_folder_path()
+        pic_folder_path = PicFileHandle.path_join(
+            PicFileHandle.__root_folder_path, NOW_DATE, pic_title)
 
         return pic_folder_path
 
-
     @staticmethod
     def get_pic_file_path(url, prefix_name, pic_folder_path):
+        """返回存储pic的路径
+        
+        Parameters
+        ----------
+        url : str
+            pic网址,用于获取文件类型
+        prefix_name : str
+            文件名称
+        pic_folder_path : str
+            存储pic的文件夹路径
+        
+        Returns
+        -------
+        str
+            返回存储pic的路径
+        """
+
         suffix_name = '.' + url.rsplit('.', 1)[1]
         pic_name = prefix_name + suffix_name
         return PicFileHandle.path_join(pic_folder_path, pic_name)
+
+    @staticmethod
+    def get_logger_file_path():
+        """返回log的路径
+        
+        Returns
+        -------
+        str
+            log的路径
+        """
+
+        # root_folder_path = PicFileHandle.get_root_folder_path()
+        pic_logger_path = PicFileHandle.path_join(
+            PicFileHandle.__root_folder_path, NOW_DATE, 'pic_log_%s.log'%NOW_TIME)
+        return pic_logger_path
+
+    @staticmethod
+    def get_downloaded_urls_path():
+        print(PicFileHandle.__root_folder_path)
+
+
+    
+
 
 
 
