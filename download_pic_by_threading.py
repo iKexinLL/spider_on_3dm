@@ -17,8 +17,8 @@ import requests
 from pic_file_handle import PicFileHandle
 from random_sleep_time import RandomSleepTime
 from get_title_urls import GetTitleUrls
-from get_pic_url_in_pages import GetPicUrlInPages
-from logging_info import console_log
+from get_pic_url_in_title_pages import GetPicUrlInTitlePages
+from logging_info import LogginInfo
 
 NOW_DATE = datetime.datetime.strftime(datetime.datetime.now(), '%Y%m%d')
 NOW_TIME = datetime.datetime.strftime(datetime.datetime.now(), '%Y%m%d_%H%M%S')
@@ -33,14 +33,14 @@ class DownloadPicByThreading(threading.Thread):
     
     """
 
-    def __init__(self, que_, f_urls):
+    def __init__(self, que_):
         threading.Thread.__init__(self)
 
         self.sleep_program = RandomSleepTime()
         self.que = que_
-        self.f_urls = f_urls
-        # print(self.f_urls.closed)
-    
+        self.downloaded_urls_path = PicFileHandle.get_downloaded_urls_path()
+        self.log_path = PicFileHandle.get_logger_file_path()
+
     def run(self):
         while True:
             self.sleep_program.sleep(0)
@@ -49,12 +49,11 @@ class DownloadPicByThreading(threading.Thread):
             img_contents = requests.get(url).content
             with open(pic_file_path, 'wb') as f:
                 f.write(img_contents)
-                self.pic_log(url, os.path.split(pic_file_path)[1])
+                self.pic_log(os.path.split(pic_file_path)[1], url)
             
-            self.write_url(url)
             self.que.task_done()
 
-    def pic_log(self, url, pic_name):
+    def pic_log(self, pic_name, url):
         """插入日志
         
         Parameters
@@ -65,21 +64,9 @@ class DownloadPicByThreading(threading.Thread):
             pic名称
         
         """
-
-        log_path = PicFileHandle.get_logger_file_path()
-        console_log(url, pic_name, log_path)
-
-    def write_url(self, url):
-        """将已下载的图片网址写入downloaded_urls.txt
+        log = LogginInfo(if_write_logs=True, logFilename=self.log_path)
+        log.info(pic_name + ' ' + url)
         
-        Parameters
-        ----------
-        url : str
-            pic网址
-        
-        """
-
-        self.f_urls.write(url + '\n')
 
 if __name__ == '__main__':
 
@@ -91,8 +78,13 @@ if __name__ == '__main__':
 
     title_urls = GetTitleUrls().start()
 
+    # 获取downloaded_urls文件的路径
+    downloaded_urls_path = PicFileHandle.get_downloaded_urls_path()
+    # 获取downloaded_urls内容
+    downloaded_urls = PicFileHandle.get_downloaded_urls()
+
     for title_url in title_urls:
-        pic_info = GetPicUrlInPages().start(title_url)
+        pic_info = GetPicUrlInTitlePages().start(title_url)
 
         pic_explain = pic_info.get('pic_explain', 'None_Pic_Explain_' + NOW_TIME)
         pic_title = pic_info.get('pic_title', 'None_Pic_Title_' + NOW_TIME)
@@ -101,21 +93,19 @@ if __name__ == '__main__':
         pic_folder_path = PicFileHandle.get_pic_folder_path(pic_title)
         # 创建存储pic的文件夹
         PicFileHandle.create_folder(pic_folder_path)
-        # 获取downloaded_urls文件的路径
-        downloaded_urls_path = PicFileHandle.get_downloaded_urls_path()
 
         for k in pic_info:
-            if k not in ('pic_explain', 'pic_title'):
-                mid_pic_file_path = PicFileHandle.get_pic_file_path(k, pic_info[k], pic_folder_path)
+            if k not in ('pic_explain', 'pic_title') and k not in downloaded_urls:
+                mid_pic_file_path = PicFileHandle.get_pic_file_path(
+                    k, pic_info[k], pic_folder_path)
                 que.put((k, mid_pic_file_path))
         
-        with open(downloaded_urls_path, 'a', encoding='utf-8') as f_url:
-            for _ in range(5):
-                t = DownloadPicByThreading(que, f_url)
-                t.setDaemon(True)
-                t.start()
+        for _ in range(5):
+            t = DownloadPicByThreading(que)
+            t.setDaemon(True)
+            t.start()
 
-            que.join()
+        que.join()
 
 
 

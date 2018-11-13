@@ -5,55 +5,180 @@
 __time__ = 2018/11/13 09:56
 __author__ = Kexin Xu
 __desc__ = 用logging代替print输出信息
+           参考(转载)自: https://blog.csdn.net/Chelydra/article/details/79850366
+           侵删
 """
 
 import logging
 
-
-def console_log(url, pic_name, logFilename):
-    """打印程序的log
-    
-    Parameters
-    ----------
-    url : str
-        pic网址
-    pic_name : str
-        pic名称
-    logFilename : str
-        log的保存路径
+class LogginInfo():
+    """在网上找到的类,防止logging重复记录
     
     """
 
-    logging.basicConfig(
-        level=logging.DEBUG, # 定义输出到文件的log级别，                                                            
-        format='%(asctime)s  %(filename)s : %(levelname)s  %(message)s', # 定义输出log的格式
-        datefmt='%Y-%m-%d %H:%M:%S', # 时间
-        filename=logFilename, # log文件名
-        filemode='w')
 
-    # 定义console handler
-    console = logging.StreamHandler()
-    # 定义该handler级别
-    console.setLevel(logging.INFO) 
-    #定义该handler格式
-    fmt = logging.Formatter('%(asctime)s %(threadName)s_%(thread)d  %(message)s',
-                            datefmt='%Y-%m-%d %H:%M:%S')                                   
-    console.setFormatter(fmt)
+    def __init__(self, if_write_logs=False, logFilename=r'e:\temp\myLog.log'):
+        self.logger = logging.getLogger(__name__)
+        # 以下三行为清空上次文件
+        # 这为清空当前文件的logging 因为logging会包含所有的文件的logging
+        logging.Logger.manager.loggerDict.pop(__name__)
+        # 将当前文件的handlers 清空
+        self.logger.handlers = []
+        # 然后再次移除当前文件logging配置
+        self.logger.removeHandler(self.logger.handlers)
 
-    logging.getLogger().addHandler(console) # 实例化添加handler
+        # 这里进行判断，如果logger.handlers列表为空，则添加，否则，直接去写日志
+        if if_write_logs and not self.logger.handlers:
+            # loggger 文件配置路径
+            self.handler = logging.FileHandler(logFilename)
+        # logger 配置等级
+        self.logger.setLevel(logging.DEBUG)
+        # logger 输出格式
+        formatter = logging.Formatter('%(asctime)s %(threadName)s_%(thread)d  %(message)s',
+                                      datefmt='%Y-%m-%d %H:%M:%S')
+        # 添加输出格式进入handler
+        self.handler.setFormatter(formatter)
+        # 添加文件设置金如handler
+        self.logger.addHandler(self.handler)
 
-    logging.info(pic_name + ' ' + url)
+    # 以下皆为重写方法 并且每次记录后清除logger
+    def info(self, message=None):
+        """logging.info
+        
+        Parameters
+        ----------
+        message : str, optional
+            打印的信息 (the default is None, which None)
+        
+        """
+
+        self.__init__()
+        self.logger.info(message)
+        self.logger.removeHandler(self.logger.handlers)
+
+    def debug(self, message=None):
+        """logging.debug
+        
+        Parameters
+        ----------
+        message : str, optional
+            打印的信息 (the default is None, which None)
+        
+        """
+
+        self.__init__()
+        self.logger.debug(message)
+        self.logger.removeHandler(self.logger.handlers)
+
+    def warning(self, message=None):
+        """logging.warning
+        
+        Parameters
+        ----------
+        message : str, optional
+            打印的信息 (the default is None, which None)
+        
+        """
+
+        self.__init__()
+        self.logger.warning(message)
+        self.logger.removeHandler(self.logger.handlers)
+
+    def error(self, message=None):
+        """logging.error
+        
+        Parameters
+        ----------
+        message : str, optional
+            打印的信息 (the default is None, which None)
+        
+        """
+
+        self.__init__()
+        self.logger.error(message)
+        self.logger.removeHandler(self.logger.handlers)
+
+    def critical(self, message=None):
+        """logging.critical
+        
+        Parameters
+        ----------
+        message : str, optional
+            打印的信息 (the default is None, which None)
+        
+        """
+
+        self.__init__()
+        self.logger.critical(message)
+        self.logger.removeHandler(self.logger.handlers)
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# def console_log_debug(pic_name, url, logFilename):
+#     """打印程序的log,使用debug方式
     
-# class LoggingInfo():
+#     Parameters
+#     ----------
+#     url : str
+#         pic网址
+#     pic_name : str
+#         pic名称
+#     logFilename : str
+#         log的保存路径
+    
+#     """
+#     logger = logging.getLogger('pic_log')
 
-#     def __init__(self):
-#         self.log = 
+#     logging.basicConfig(
+#         level=logging.DEBUG, # 定义输出到文件的log级别
+#         format='%(asctime)s  %(filename)s : %(levelname)s  %(message)s', # 定义输出log的格式
+#         datefmt='%Y-%m-%d %H:%M:%S', # 时间
+#         filename=logFilename, # log文件名
+#         filemode='w')
 
-#     @staticmethod
-#     def logging_format(format):
-#         pass
+#     # 定义console handler, Strem不影响输出的文件
+#     console = logging.StreamHandler()
+#     # 定义该handler级别
+#     console.setLevel(logging.INFO) 
+#     #定义该handler格式
+#     fmt = logging.Formatter('%(asctime)s %(threadName)s_%(thread)d  %(message)s',
+#                             datefmt='%Y-%m-%d %H:%M:%S')
+#     # fmt = logging.Formatter('%(message)s')
+#     console.setFormatter(fmt)
+
+#     logging.getLogger().addHandler(console) # 实例化添加handler
+
+#     logging.debug(pic_name + ' ' + url)
+#     logger.removeHandler(console)
+    
 
 # StreamHandler：logging.StreamHandler；日志输出到流，可以是sys.stderr，sys.stdout或者文件
 # FileHandler：logging.FileHandler；日志输出到文件
@@ -67,3 +192,11 @@ def console_log(url, pic_name, logFilename):
 # NTEventLogHandler：logging.handlers.NTEventLogHandler；远程输出日志到Windows NT/2000/XP的事件日志
 # MemoryHandler：logging.handlers.MemoryHandler；日志输出到内存中的指定buffer
 # HTTPHandler：logging.handlers.HTTPHandler；通过"GET"或者"POST"远程输出到HTTP服务器
+
+
+# 级别排序:CRITICAL > ERROR > WARNING > INFO > DEBUG
+# DEBUG : 打印全部的日志,详细的信息,通常只出现在诊断问题上
+# INFO : 打印info,warning,error,critical级别的日志,确认一切按预期运行
+# WARNING : 打印warning,error,critical级别的日志,一个迹象表明,一些意想不到的事情发生了,或表明一些问题在不久的将来(例如。磁盘空间低”),这个软件还能按预期工作
+# ERROR : 打印error,critical级别的日志,更严重的问题,软件没能执行一些功能
+# CRITICAL : 打印critical级别,一个严重的错误,这表明程序本身可能无法继续运行
