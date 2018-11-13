@@ -32,6 +32,7 @@
 - [x] 添加logging,对程序进行监督
 - [ ] 添加重连方法(?未确定)
 - [ ] 将pic网址写入downloaded_urls.txt,防止下次重复下载
-
+- [ ] 每天定时执行
+- [ ] 在unbuntu上部署
 
 
