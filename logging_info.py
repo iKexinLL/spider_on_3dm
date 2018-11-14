@@ -18,6 +18,15 @@ class LogginInfo():
 
 
     def __init__(self, if_write_logs=False, logFilename=r'e:\temp\myLog.log'):
+
+        # 这个设置还需要在理解一下
+        logging.basicConfig(
+            level=logging.DEBUG, # 定义输出到文件的log级别
+            format='%(asctime)s  %(filename)s : %(levelname)s  %(message)s', # 定义输出log的格式
+            datefmt='%Y-%m-%d %H:%M:%S', # 时间
+            filename=logFilename, # log文件名
+            filemode='w')
+
         self.logger = logging.getLogger(__name__)
         # 以下三行为清空上次文件
         # 这为清空当前文件的logging 因为logging会包含所有的文件的logging
@@ -30,16 +39,19 @@ class LogginInfo():
         # 这里进行判断，如果logger.handlers列表为空，则添加，否则，直接去写日志
         if if_write_logs and not self.logger.handlers:
             # loggger 文件配置路径
-            self.handler = logging.FileHandler(logFilename)
+            self.file_handler = logging.FileHandler(logFilename, encoding='utf-8')
+            self.stream_handler = logging.StreamHandler()
         # logger 配置等级
         self.logger.setLevel(logging.DEBUG)
         # logger 输出格式
-        formatter = logging.Formatter('%(asctime)s %(threadName)s_%(thread)d  %(message)s',
-                                      datefmt='%Y-%m-%d %H:%M:%S')
+        file_formatter = logging.Formatter('%(asctime)s %(threadName)s_%(thread)d  %(message)s',
+                                           datefmt='%Y-%m-%d %H:%M:%S')
         # 添加输出格式进入handler
-        self.handler.setFormatter(formatter)
-        # 添加文件设置金如handler
-        self.logger.addHandler(self.handler)
+        self.file_handler.setFormatter(file_formatter)
+        self.stream_handler.setFormatter(file_formatter)
+        # 添加文件设置如handler
+        self.logger.addHandler(self.file_handler)
+        self.logger.addHandler(self.stream_handler)
 
     # 以下皆为重写方法 并且每次记录后清除logger
     def info(self, message=None):
@@ -113,32 +125,101 @@ class LogginInfo():
         self.logger.removeHandler(self.logger.handlers)
 
 
+class LogginInfoOnlyStream():
+    """只使用logging打印url
+    
+    """
 
 
+    def __init__(self):
 
+        self.logger = logging.getLogger(__name__)
+        logging.Logger.manager.loggerDict.pop(__name__)
+        self.logger.handlers = []
+        self.logger.removeHandler(self.logger.handlers)
+        self.logger.setLevel(logging.DEBUG)
+        # logger 输出格式
+        file_formatter = logging.Formatter('%(asctime)s  %(message)s',
+                                           datefmt='%Y-%m-%d %H:%M:%S')
+        if not self.logger.handlers:
+            # loggger 文件配置路径
+            self.stream_handler = logging.StreamHandler()
 
+        # 添加输出格式进入handler
+        self.stream_handler.setFormatter(file_formatter)
+        # 添加文件设置如handler
+        self.logger.addHandler(self.stream_handler)
 
+    # 以下皆为重写方法 并且每次记录后清除logger
+    def info(self, message=None):
+        """logging.info
+        
+        Parameters
+        ----------
+        message : str, optional
+            打印的信息 (the default is None, which None)
+        
+        """
 
+        self.__init__()
+        self.logger.info(message)
+        self.logger.removeHandler(self.logger.handlers)
 
+    def debug(self, message=None):
+        """logging.debug
+        
+        Parameters
+        ----------
+        message : str, optional
+            打印的信息 (the default is None, which None)
+        
+        """
 
+        self.__init__()
+        self.logger.debug(message)
+        self.logger.removeHandler(self.logger.handlers)
 
+    def warning(self, message=None):
+        """logging.warning
+        
+        Parameters
+        ----------
+        message : str, optional
+            打印的信息 (the default is None, which None)
+        
+        """
 
+        self.__init__()
+        self.logger.warning(message)
+        self.logger.removeHandler(self.logger.handlers)
 
+    def error(self, message=None):
+        """logging.error
+        
+        Parameters
+        ----------
+        message : str, optional
+            打印的信息 (the default is None, which None)
+        
+        """
 
+        self.__init__()
+        self.logger.error(message)
+        self.logger.removeHandler(self.logger.handlers)
 
+    def critical(self, message=None):
+        """logging.critical
+        
+        Parameters
+        ----------
+        message : str, optional
+            打印的信息 (the default is None, which None)
+        
+        """
 
-
-
-
-
-
-
-
-
-
-
-
-
+        self.__init__()
+        self.logger.critical(message)
+        self.logger.removeHandler(self.logger.handlers)
 
 
 

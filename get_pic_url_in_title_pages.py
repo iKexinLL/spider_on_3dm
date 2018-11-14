@@ -11,6 +11,7 @@ import time
 from bs4 import Tag
 
 from get_title_urls import GetTitleUrls
+from logging_info import LogginInfoOnlyStream
 
 class GetPicUrlInTitlePages(GetTitleUrls):
     """输入title中的网址,对网址内容进行解析获取每一页上的图片下载地址
@@ -88,6 +89,20 @@ class GetPicUrlInTitlePages(GetTitleUrls):
 
         return tag.has_attr('alt')
 
+
+    def url_log(self, url):
+        """在控制台输出url
+        
+        Parameters
+        ----------
+        url : str
+            pic网址
+        
+        """
+
+        log = LogginInfoOnlyStream()
+        log.info('getting pic url from title: ' + url)
+
     def start(self, url=r'https://www.3dmgame.com/bagua/540.html'):
         """仅作测试使用
         
@@ -108,7 +123,8 @@ class GetPicUrlInTitlePages(GetTitleUrls):
         res_d = {}
 
         while url:
-            print('url in get_pic_url_in_title_pages is ' + url)
+            #print('url in get_pic_url_in_title_pages is ' + url)
+            self.url_log(url)
             soup = self.get_soup(url)
             res_d.update(self.get_pic_url_and_info(soup))
             self.sleep_program.sleep(3)
