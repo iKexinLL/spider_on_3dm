@@ -88,10 +88,8 @@ class GetTitleUrls():
             if next_button.a:
                 return next_button.a['href']
 
-    def start(self):
-        """ 仅作测试使用
-        调用其它方法,返回所有的title网址
-        
+    def return_title_urls(self):
+        """调用其它方法,返回所有的title网址        
         Returns
         -------
         list
@@ -110,5 +108,5 @@ class GetTitleUrls():
 
 if __name__ == '__main__':
     tp = GetTitleUrls()
-    res = tp.start()
+    res = tp.return_title_urls()
     print(res)

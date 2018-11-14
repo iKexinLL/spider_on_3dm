@@ -76,7 +76,7 @@ if __name__ == '__main__':
 
     que = queue.Queue()
 
-    title_urls = GetTitleUrls().start()
+    title_urls = GetTitleUrls().return_title_urls()
 
     # 获取downloaded_urls文件的路径
     downloaded_urls_path = PicFileHandle.get_downloaded_urls_path()
