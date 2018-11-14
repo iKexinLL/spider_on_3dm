@@ -9,12 +9,12 @@ __desc__ = 输入title中的网址,对网址内容进行解析获取每一页上
 
 import time
 from bs4 import Tag
-from collections import namedtuple
+# from collections import namedtuple
 
 from get_title_urls import GetTitleUrls
 from logging_info import LogginInfoOnlyStream
 
-class GetPicUrlInTitlePages(GetTitleUrls):
+class GetPicInfoInTitlePages(GetTitleUrls):
     """输入title中的网址,对网址内容进行解析获取每一页上的图片下载地址
     
     """
@@ -23,7 +23,7 @@ class GetPicUrlInTitlePages(GetTitleUrls):
         """初始化父类__init__方法
         
         """
-        super(GetPicUrlInTitlePages, self).__init__()
+        super(GetPicInfoInTitlePages, self).__init__()
         # self.pic_info = namedtuple('picInfo', ['pic_name', 'pic_location'])
         self.h = lambda num: str(num) if int(num) > 9 else '0' + str(num) 
         # self.get_pic_url_and_info(soup)
@@ -112,7 +112,6 @@ class GetPicUrlInTitlePages(GetTitleUrls):
 
         return tag.has_attr('alt')
 
-
     def url_log(self, url):
         """在控制台输出url
         
@@ -158,7 +157,7 @@ class GetPicUrlInTitlePages(GetTitleUrls):
 
 
 if __name__ == '__main__':
-    tp = GetPicUrlInTitlePages().return_pic_info()
+    tp = GetPicInfoInTitlePages().return_pic_info()
     print(tp)
     # tp = {'pic_explain': '周一来临，快来欣赏云飞系列的新内涵囧图。美女姿势诱惑，你们有大胆的想法吗？\
     # 救人一命胜造七级浮屠，妹子这么痛苦就让我来帮忙吧！小姐姐胸前的字太霸气，是男人都蠢蠢欲动。大叔看到什么吓成这样，难道是被性感美女吓坏了？', 

@@ -17,7 +17,7 @@ import requests
 from pic_file_handle import PicFileHandle
 from random_sleep_time import RandomSleepTime
 from get_title_urls import GetTitleUrls
-from get_pic_url_in_title_pages import GetPicUrlInTitlePages
+from get_pic_info_in_title_pages import GetPicInfoInTitlePages
 from logging_info import LogginInfo
 
 NOW_DATE = datetime.datetime.strftime(datetime.datetime.now(), '%Y%m%d')
@@ -84,7 +84,7 @@ if __name__ == '__main__':
     downloaded_urls = PicFileHandle.get_downloaded_urls()
 
     for title_url in title_urls:
-        pic_info = GetPicUrlInTitlePages().start(title_url)
+        pic_info = GetPicInfoInTitlePages().return_pic_info(title_url)
 
         pic_explain = pic_info.get('pic_explain', 'None_Pic_Explain_' + NOW_TIME)
         pic_title = pic_info.get('pic_title', 'None_Pic_Title_' + NOW_TIME)
@@ -93,6 +93,8 @@ if __name__ == '__main__':
         pic_folder_path = PicFileHandle.get_pic_folder_path(pic_title)
         # 创建存储pic的文件夹
         PicFileHandle.create_folder(pic_folder_path)
+        # 将pic_explain写入到pic文件夹内
+        PicFileHandle.write_pic_explain(title_url, pic_explain, pic_folder_path)
 
         for k in pic_info:
             if k not in ('pic_explain', 'pic_title') and k not in downloaded_urls:

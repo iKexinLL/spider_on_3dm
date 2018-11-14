@@ -159,7 +159,7 @@ class PicFileHandle():
         url : str
             pic网址,用于获取文件类型
         prefix_name : str
-            文件名称
+            文件名称,一般为图片下方的说明
         pic_folder_path : str
             存储pic的文件夹路径
         
@@ -202,7 +202,6 @@ class PicFileHandle():
         return PicFileHandle.path_join(
             PicFileHandle.__root_folder_path, 'downloaded_urls.txt')
         
-
     @staticmethod
     def get_downloaded_urls():
         """获取已下载的pic地址
@@ -233,9 +232,27 @@ class PicFileHandle():
             with open(mid_path, 'w'):
                 pass
 
+    @staticmethod
+    def write_pic_explain(title_url, pic_explain, pic_folder_path):
+        """将pic_explain的内容写入到pic根目录
+        
+        Parameters
+        ----------
+        title_url : str
+            爬取的pic网址,方便之后查找
+        pic_explain : str
+            title说明
+        pic_folder_path : str
+            pic的根目录
+        
+        """
+        mid_path = PicFileHandle.path_join(pic_folder_path, 'pic_explain.txt')
+        with open(mid_path, 'w', encoding='utf-8') as f:
+            f.write(title_url + '\n')
+            f.write(pic_explain)
 
 if __name__ == '__main__':
-    print(PicFileHandle.get_downloaded_urls())
+    print(PicFileHandle.write_pic_explain('w', 'qwe', r'e:\temp'))
 
 
 
