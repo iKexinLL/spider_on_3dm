@@ -48,5 +48,5 @@ class RandomSleepTime():
         """
         base_time = 0 if base_time == 0 else base_time
         sleep_time = self.random_time(base_time)
-        print('睡眠: %s秒'%sleep_time)
+        # print('睡眠: %s秒'%sleep_time)
         time.sleep(sleep_time)
