@@ -46,18 +46,23 @@ class DownloadPicByThreading(threading.Thread):
             self.sleep_program.sleep(0)
             url, pic_file_path = self.que.get()
 
+            start_time = datetime.datetime.now()          
             img_contents = requests.get(url).content
             with open(pic_file_path, 'wb') as f:
                 f.write(img_contents)
-                self.pic_log(os.path.split(pic_file_path)[1], url)
+                runing_time = datetime.datetime.now() - start_time
+                runing_time = str(runing_time.seconds) + '.' + str(runing_time.microseconds)[:2]  
+                self.pic_log(runing_time, os.path.split(pic_file_path)[1], url)
             
             self.que.task_done()
 
-    def pic_log(self, pic_name, url):
+    def pic_log(self, download_time, pic_name, url):
         """插入日志
         
         Parameters
         ----------
+        download_time : str
+            下载时间
         url : str
             pic网址
         pic_name : str
@@ -66,7 +71,7 @@ class DownloadPicByThreading(threading.Thread):
         """
 
         log = LogginInfo(logFilename=self.log_path)
-        log.debug(pic_name + ' ' + url)
+        log.debug(download_time + 's ' + pic_name + ' ' + url)
         
 
 if __name__ == '__main__':
