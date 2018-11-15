@@ -105,7 +105,7 @@ class GetTitleUrls():
         log = LogginInfoOnlyStream()
         temp_res = []
         while url:
-            log.info("getting title url in : " + url)
+            log.info("getting title url in: " + url)
             soup = self.get_soup(url)
             self.sleep_program.sleep(0)
             temp_res.extend(self.get_title_urls(soup))
