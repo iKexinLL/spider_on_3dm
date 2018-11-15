@@ -10,6 +10,8 @@ __desc__ = 返回一个睡眠时间,方式爬虫被封锁
 import random
 import time
 
+# from logging_info import LogginInfoOnlyStream
+
 class RandomSleepTime():
     """返回一个睡眠时间,方式爬虫被封锁
     
@@ -49,4 +51,5 @@ class RandomSleepTime():
         base_time = 0 if base_time == 0 else base_time
         sleep_time = self.random_time(base_time)
         # print('睡眠: %s秒'%sleep_time)
+        # LogginInfoOnlyStream().info('睡眠: %s秒'%sleep_time)
         time.sleep(sleep_time)
