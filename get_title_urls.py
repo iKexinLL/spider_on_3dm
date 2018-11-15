@@ -88,8 +88,14 @@ class GetTitleUrls():
             if next_button.a:
                 return next_button.a['href']
 
-    def return_title_urls(self):
-        """调用其它方法,返回所有的title网址        
+    def return_title_urls(self, if_break=False):
+        """调用其它方法,返回所有的title网址
+        
+        Parameters
+        ----------
+        if_break : bool, optional
+            减少循环,方便对程序进行测试 (the default is False, which 不循环)
+        
         Returns
         -------
         list
@@ -104,6 +110,8 @@ class GetTitleUrls():
             self.sleep_program.sleep(0)
             temp_res.extend(self.get_title_urls(soup))
             url = self.get_next_page(soup)
+            if if_break:
+                break
 
         return temp_res
                 

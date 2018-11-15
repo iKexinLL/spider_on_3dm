@@ -64,8 +64,8 @@ class DownloadPicByThreading(threading.Thread):
             pic名称
         
         """
-        log = LogginInfo(if_write_logs=True, logFilename=self.log_path)
-        log.info(pic_name + ' ' + url)
+        log = LogginInfo(logFilename=self.log_path)
+        log.debug(pic_name + ' ' + url)
         
 
 if __name__ == '__main__':
@@ -76,7 +76,7 @@ if __name__ == '__main__':
 
     que = queue.Queue()
 
-    title_urls = GetTitleUrls().return_title_urls()
+    title_urls = GetTitleUrls().return_title_urls(if_break=True)
 
     # 获取downloaded_urls文件的路径
     downloaded_urls_path = PicFileHandle.get_downloaded_urls_path()
@@ -84,7 +84,7 @@ if __name__ == '__main__':
     downloaded_urls = PicFileHandle.get_downloaded_urls()
 
     for title_url in title_urls:
-        pic_info = GetPicInfoInTitlePages().return_pic_info(title_url)
+        pic_info = GetPicInfoInTitlePages().return_pic_info(title_url, if_break=True)
 
         pic_explain = pic_info.get('pic_explain', 'None_Pic_Explain_' + NOW_TIME)
         pic_title = pic_info.get('pic_title', 'None_Pic_Title_' + NOW_TIME)
@@ -101,13 +101,16 @@ if __name__ == '__main__':
                 mid_pic_file_path = PicFileHandle.get_pic_file_path(
                     k, pic_info[k], pic_folder_path)
                 que.put((k, mid_pic_file_path))
-        
-        for _ in range(5):
-            t = DownloadPicByThreading(que)
-            t.setDaemon(True)
-            t.start()
+    
+    # 关于这个循环放在for k in pic_info外面的解释
+    # 当这个循环在里面时,每个循环,都会创建五个线程,造成线程超多
+    # 20181115_171927 我不确定为什么下载完的线程为什么没结束
+    for _ in range(5):
+        t = DownloadPicByThreading(que)
+        t.setDaemon(True)
+        t.start()
 
-        que.join()
+    que.join()
 
 
 

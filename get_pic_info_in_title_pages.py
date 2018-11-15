@@ -125,22 +125,21 @@ class GetPicInfoInTitlePages(GetTitleUrls):
         log = LogginInfoOnlyStream()
         log.info('getting pic url from title: ' + url)
 
-    def return_pic_info(self, url=r'https://www.3dmgame.com/bagua/540.html'):
+    def return_pic_info(self, url=r'https://www.3dmgame.com/bagua/540.html', if_break=False):
         """返回pic的信息,网址以及名称
         
         Parameters
         ----------
         url : regexp, optional
             title网址 (the default is r'https://www.3dmgame.com/bagua/540.html', which 默认测试的title网址)
-        
+        if_break : bool, optional
+            减少循环,方便对程序进行测试 (the default is False, which 不循环)
         Returns
         -------
         dict
             pic_explain -> title说明
             图片网址 -> 图片说明
         """
-
-
         # url = r'https://www.3dmgame.com/bagua/525.html'
         res_d = {}
 
@@ -151,7 +150,8 @@ class GetPicInfoInTitlePages(GetTitleUrls):
             res_d.update(self.get_pic_url_and_info(soup))
             self.sleep_program.sleep(3)
             url = self.get_next_page(soup)
-            break
+            if if_break:
+                break
             
         return res_d
 
