@@ -14,7 +14,7 @@ from bs4 import BeautifulSoup
 
 from get_config import GetConfig
 from random_sleep_time import RandomSleepTime
-
+from logging_info import LogginInfoOnlyStream
 
 
 class GetTitleUrls():
@@ -96,8 +96,10 @@ class GetTitleUrls():
             返回所有的title网址
         """
         url = GetConfig.get_config()['root_url']
+        log = LogginInfoOnlyStream()
         temp_res = []
         while url:
+            log.info("getting title url in : " + url)
             soup = self.get_soup(url)
             self.sleep_program.sleep(0)
             temp_res.extend(self.get_title_urls(soup))
