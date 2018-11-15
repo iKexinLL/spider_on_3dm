@@ -16,41 +16,32 @@ class LogginInfo():
     
     """
 
+    def __init__(self, logFilename=r'e:\temp\myLog.log'):
 
-    def __init__(self, if_write_logs=False, logFilename=r'e:\temp\myLog.log'):
-
+        self.logFilename = logFilename
         # 这个设置还需要在理解一下
         logging.basicConfig(
             level=logging.DEBUG, # 定义输出到文件的log级别
             format='%(asctime)s  %(filename)s : %(levelname)s  %(message)s', # 定义输出log的格式
             datefmt='%Y-%m-%d %H:%M:%S', # 时间
-            filename=logFilename, # log文件名
+            filename=self.logFilename, # log文件名
             filemode='w')
 
         self.logger = logging.getLogger(__name__)
         # 以下三行为清空上次文件
-        # 这为清空当前文件的logging 因为logging会包含所有的文件的logging
         logging.Logger.manager.loggerDict.pop(__name__)
-        # 将当前文件的handlers 清空
         self.logger.handlers = []
-        # 然后再次移除当前文件logging配置
         self.logger.removeHandler(self.logger.handlers)
 
-        # 这里进行判断，如果logger.handlers列表为空，则添加，否则，直接去写日志
-        if if_write_logs and not self.logger.handlers:
-            # loggger 文件配置路径
-            self.file_handler = logging.FileHandler(logFilename, encoding='utf-8')
+        if not self.logger.handlers:
+            # 控制台输出
             self.stream_handler = logging.StreamHandler()
-        # logger 配置等级
+
         self.logger.setLevel(logging.DEBUG)
-        # logger 输出格式
         file_formatter = logging.Formatter('%(asctime)s %(threadName)s_%(thread)d  %(message)s',
                                            datefmt='%Y-%m-%d %H:%M:%S')
-        # 添加输出格式进入handler
-        self.file_handler.setFormatter(file_formatter)
+
         self.stream_handler.setFormatter(file_formatter)
-        # 添加文件设置如handler
-        self.logger.addHandler(self.file_handler)
         self.logger.addHandler(self.stream_handler)
 
     # 以下皆为重写方法 并且每次记录后清除logger
@@ -64,7 +55,7 @@ class LogginInfo():
         
         """
 
-        self.__init__()
+        self.__init__(self.logFilename)
         self.logger.info(message)
         self.logger.removeHandler(self.logger.handlers)
 
@@ -78,7 +69,7 @@ class LogginInfo():
         
         """
 
-        self.__init__()
+        self.__init__(self.logFilename)
         self.logger.debug(message)
         self.logger.removeHandler(self.logger.handlers)
 
@@ -92,7 +83,7 @@ class LogginInfo():
         
         """
 
-        self.__init__()
+        self.__init__(self.logFilename)
         self.logger.warning(message)
         self.logger.removeHandler(self.logger.handlers)
 
@@ -106,7 +97,7 @@ class LogginInfo():
         
         """
 
-        self.__init__()
+        self.__init__(self.logFilename)
         self.logger.error(message)
         self.logger.removeHandler(self.logger.handlers)
 
@@ -120,7 +111,7 @@ class LogginInfo():
         
         """
 
-        self.__init__()
+        self.__init__(self.logFilename)
         self.logger.critical(message)
         self.logger.removeHandler(self.logger.handlers)
 

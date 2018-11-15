@@ -33,13 +33,13 @@ class DownloadPicByThreading(threading.Thread):
     
     """
 
-    def __init__(self, que_):
+    def __init__(self, que_, log_path):
         threading.Thread.__init__(self)
 
         self.sleep_program = RandomSleepTime()
         self.que = que_
         self.downloaded_urls_path = PicFileHandle.get_downloaded_urls_path()
-        self.log_path = PicFileHandle.get_logger_file_path()
+        self.log_path = log_path
 
     def run(self):
         while True:
@@ -64,6 +64,7 @@ class DownloadPicByThreading(threading.Thread):
             pic名称
         
         """
+
         log = LogginInfo(logFilename=self.log_path)
         log.debug(pic_name + ' ' + url)
         
@@ -77,6 +78,7 @@ if __name__ == '__main__':
     que = queue.Queue()
 
     title_urls = GetTitleUrls().return_title_urls(if_break=True)
+    mid_log_path = PicFileHandle.get_logger_file_path()
 
     # 获取downloaded_urls文件的路径
     downloaded_urls_path = PicFileHandle.get_downloaded_urls_path()
@@ -101,12 +103,14 @@ if __name__ == '__main__':
                 mid_pic_file_path = PicFileHandle.get_pic_file_path(
                     k, pic_info[k], pic_folder_path)
                 que.put((k, mid_pic_file_path))
+        
+        break
     
     # 关于这个循环放在for k in pic_info外面的解释
     # 当这个循环在里面时,每个循环,都会创建五个线程,造成线程超多
     # 20181115_171927 我不确定为什么下载完的线程为什么没结束
     for _ in range(5):
-        t = DownloadPicByThreading(que)
+        t = DownloadPicByThreading(que, mid_log_path)
         t.setDaemon(True)
         t.start()
 
