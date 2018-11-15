@@ -145,10 +145,10 @@ class GetPicInfoInTitlePages(GetTitleUrls):
 
         while url:
             #print('url in get_pic_url_in_title_pages is ' + url)
-            self.url_log(url)
             soup = self.get_soup(url)
+            self.url_log(url)
             res_d.update(self.get_pic_url_and_info(soup))
-            self.sleep_program.sleep(3)
+            self.sleep_program.sleep(1)
             url = self.get_next_page(soup)
             if if_break:
                 break
