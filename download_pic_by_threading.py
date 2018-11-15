@@ -84,7 +84,7 @@ if __name__ == '__main__':
 
     que = queue.Queue()
 
-    title_urls = GetTitleUrls().return_title_urls(if_break=True)
+    title_urls = GetTitleUrls().return_title_urls(if_break=False)
     mid_log_path = PicFileHandle.get_logger_file_path()
 
     # 获取downloaded_urls文件的路径
@@ -93,7 +93,7 @@ if __name__ == '__main__':
     downloaded_urls = PicFileHandle.get_downloaded_urls()
 
     for title_url in title_urls:
-        pic_info = GetPicInfoInTitlePages().return_pic_info(title_url, if_break=True)
+        pic_info = GetPicInfoInTitlePages().return_pic_info(title_url, if_break=False)
 
         pic_explain = pic_info.get('pic_explain', 'None_Pic_Explain_' + NOW_TIME)
         pic_title = pic_info.get('pic_title', 'None_Pic_Title_' + NOW_TIME)
