@@ -32,7 +32,7 @@ class GetConfig:
         :rtype: dict
         """
 
-        ini_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), r'config\config.ini')
+        ini_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'config', 'config.ini')
         # ini_path = r'I:\my_python_spider\spider_on_3dm\config\config.ini'
         config = ConfigParser()
         config.read(ini_path, encoding='utf-8')
