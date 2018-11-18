@@ -11,6 +11,7 @@ __desc__ = 处理pic相关的路径以及文件夹,文件操作
 import os
 import re
 import datetime
+import warnings
 
 from get_config import GetConfig
 
@@ -34,7 +35,7 @@ class PicFileHandle():
     @staticmethod
     def replace_invalid_char(path):
         r"""剔除windows路径或文件上的非法字符
-           规则: r'\*|\?|"|<|>|\||\u3000'
+           规则: r'//*|\*|\?|"|<|>|\||\u3000'
         
         Parameters
         ----------
@@ -47,7 +48,7 @@ class PicFileHandle():
             剔除后的路径
         """
 
-        re_compile = re.compile(r'\*|\?|"|<|>|\||\u3000')
+        re_compile = re.compile(r'//*|\*|\?|"|<|>|\||\u3000')
         return re.sub(re_compile, '_', path)
 
     @staticmethod
@@ -151,8 +152,8 @@ class PicFileHandle():
         return pic_folder_path
 
     @staticmethod
-    def get_pic_file_path(url, prefix_name, pic_folder_path):
-        """返回存储pic的路径
+    def get_pic_file_path_bak(url, prefix_name, pic_folder_path):
+        """返回存储pic的路径,此方法作废
         
         Parameters
         ----------
@@ -167,8 +168,17 @@ class PicFileHandle():
         -------
         str
             返回存储pic的路径
+        
+        Modify
+        -------
+        由于有些图片没有后缀,导致这个方法的suffix_name失效
+        而且有些gif图片格式后缀为jpg,导致下载到本地的时候变为静态图片
+        准确的方法是在获取图片内容时,使用r.headers['Content-Type']来判断图片类型
+        所以需要修改相应的方法来匹配r.headers['Content-Type']
+        此方法作废
         """
 
+        warnings.warn('此方法作废,因为可能无法正确获取图片的后缀')
         suffix_name = '.' + url.rsplit('.', 1)[1]
         pic_name = prefix_name + suffix_name
         return PicFileHandle.path_join(pic_folder_path, pic_name)
@@ -191,12 +201,12 @@ class PicFileHandle():
 
     @staticmethod
     def get_downloaded_urls_path():
-        """返回downloaded_urls的路径
+        """返回downloaded_urls.txt的路径
         
         Returns
         -------
         str
-            downloaded_urls的路径
+            downloaded_urls.txt的路径
         """
 
         return PicFileHandle.path_join(
