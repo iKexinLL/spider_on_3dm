@@ -157,7 +157,7 @@ class GetPicInfoInTitlePages(GetTitleUrls):
 
 
 if __name__ == '__main__':
-    tp = GetPicInfoInTitlePages().return_pic_info()
+    tp = GetPicInfoInTitlePages().return_pic_info(if_break=True)
     print(tp)
     # tp = {'pic_explain': '周一来临，快来欣赏云飞系列的新内涵囧图。美女姿势诱惑，你们有大胆的想法吗？\
     # 救人一命胜造七级浮屠，妹子这么痛苦就让我来帮忙吧！小姐姐胸前的字太霸气，是男人都蠢蠢欲动。大叔看到什么吓成这样，难道是被性感美女吓坏了？', 
