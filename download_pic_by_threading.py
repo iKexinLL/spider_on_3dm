@@ -19,6 +19,7 @@ from random_sleep_time import RandomSleepTime
 from get_title_urls import GetTitleUrls
 from get_pic_info_in_title_pages import GetPicInfoInTitlePages
 from logging_info import LogginInfo
+from logging_info import LogginInfoOnlyStream
 from get_config import GetConfig
 
 NOW_DATE = datetime.datetime.strftime(datetime.datetime.now(), '%Y%m%d')
@@ -50,7 +51,11 @@ class DownloadPicByThreading(threading.Thread):
     def run(self):
         while True:
             self.sleep_program.sleep(0)
-            url, mid_pic_name, mid_pic_folder_path = self.que.get()
+            # url -> url, mid_pic_name -> 图片名称
+            # mid_pic_folder_path -> 存储pic的路径
+            # pic_num -> 图片的排名
+            # pic_counts -> 此title中的图片总数            
+            url, mid_pic_name, mid_pic_folder_path, pic_num, pic_counts = self.que.get()
             
             start_time = datetime.datetime.now()
             r = requests.get(url)
@@ -71,7 +76,7 @@ class DownloadPicByThreading(threading.Thread):
                     self.f_write_urls.write(url + '\n')
                     runing_time = datetime.datetime.now() - start_time
                     runing_time = str(runing_time.seconds) + '.' + str(runing_time.microseconds)[:2]  
-                    self.pic_log(runing_time, os.path.split(pic_file_path)[1], url)
+                    self.pic_log(pic_num, pic_counts, runing_time, os.path.split(pic_file_path)[1], url)
 
             except IOError as io_e:
                 import sys
@@ -81,7 +86,7 @@ class DownloadPicByThreading(threading.Thread):
             finally:
                 self.que.task_done()
 
-    def pic_log(self, download_time, pic_name, url):
+    def pic_log(self, pic_num, pic_counts, download_time, pic_name, url):
         """插入日志
         
         Parameters
@@ -96,7 +101,8 @@ class DownloadPicByThreading(threading.Thread):
         """
 
         log = LogginInfo(logFilename=self.log_path)
-        log.debug(download_time + 's ' + pic_name + ' ' + url)
+        log.debug(str(pic_num)  + '//' + str(pic_counts) + ' ' + \
+                  download_time + 's ' + pic_name + ' ' + url)
         
 
 if __name__ == '__main__':
@@ -106,8 +112,10 @@ if __name__ == '__main__':
     # 3.根据pic_title创建存储的文件夹
 
     que = queue.Queue()
+    logging_stream = LogginInfoOnlyStream()
 
     title_urls = GetTitleUrls().return_title_urls(if_test_programm=IF_TEST_PROGRAMM)
+    logging_stream.info('getting %s titles '% (len(title_urls)))
     mid_log_path = PicFileHandle.get_logger_file_path()
 
     # 获取downloaded_urls文件的路径
@@ -118,9 +126,16 @@ if __name__ == '__main__':
     for title_url in title_urls:
         pic_info = GetPicInfoInTitlePages().return_pic_info(title_url, 
                                                             if_test_programm=IF_TEST_PROGRAMM)
+        len_pic_info = len(pic_info) - 2
+        logging_stream.info('getting %s pics in title: %s'% (len_pic_info, title_url))
 
-        pic_explain = pic_info.get('pic_explain', 'None_Pic_Explain_' + NOW_TIME)
-        pic_title = pic_info.get('pic_title', 'None_Pic_Title_' + NOW_TIME)
+        # 为保证len_pic_info为len(pic_info) - 2, 手动添加pic_explain,pic_title
+        # 然后进行pop
+        pic_info.setdefault('pic_explain', 'None_Pic_Explain_' + NOW_TIME)
+        pic_info.setdefault('pic_title', 'None_Pic_Title_' + NOW_TIME)
+
+        pic_explain = pic_info.pop('pic_explain')
+        pic_title = pic_info.pop('pic_title')
 
         # 获取存储pic的文件夹路径
         pic_folder_path = PicFileHandle.get_pic_folder_path(pic_title)
@@ -129,16 +144,18 @@ if __name__ == '__main__':
         # 将pic_explain写入到pic文件夹内
         PicFileHandle.write_pic_explain(title_url, pic_explain, pic_folder_path)
 
-        for k in pic_info:
+        for n, k in enumerate(pic_info):
             if k not in ('pic_explain', 'pic_title') and k not in downloaded_urls:
                 # mid_pic_file_path = PicFileHandle.get_pic_file_path(
                 #     k, pic_info[k], pic_folder_path)
-                que.put((k, pic_info[k], pic_folder_path))
 
-                if IF_TEST_PROGRAMM == 'true':
-                    break
-    
-    # 关于这个循环放在for k in pic_info外面的解释
+                # k -> url, pic_info[k] -> 图片名称
+                # pic_folder_path -> 存储pic的路径
+                # n -> 图片的排名
+                # len_pic_info -> 此title中的图片总数
+                que.put((k, pic_info[k], pic_folder_path, (n + 1), len_pic_info))
+
+    # 关于这个循环放在与title_url in title_urls同级的解释
     # 当这个循环在里面时,每个循环,都会创建五个线程,造成线程超多
     # 20181115_171927 我不确定为什么下载完的线程为什么没结束
     with open(downloaded_urls_path, 'a', encoding='utf-8') as f:
@@ -148,7 +165,7 @@ if __name__ == '__main__':
             t.start()
 
         que.join()
-    
+
     print('Program End')
 
 
