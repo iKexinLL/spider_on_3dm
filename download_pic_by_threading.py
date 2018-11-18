@@ -33,25 +33,30 @@ class DownloadPicByThreading(threading.Thread):
     
     """
 
-    def __init__(self, que_, log_path, f_urls):
+    def __init__(self, que_, log_path, f_write_urls):
         threading.Thread.__init__(self)
 
         self.sleep_program = RandomSleepTime()
         self.que = que_
         self.downloaded_urls_path = PicFileHandle.get_downloaded_urls_path()
         self.log_path = log_path
-        self.f_urls = f_urls
+        self.f_write_urls = f_write_urls
 
     def run(self):
         while True:
             self.sleep_program.sleep(0)
-            url, pic_file_path = self.que.get()
+            url, mid_pic_name, mid_pic_folder_path = self.que.get()
+            
+            start_time = datetime.datetime.now()
+            r = requests.get(url)
+            img_contents = r.content
+            content_type = r.headers['Content-Type']
+            mid_pic_name = mid_pic_name + '.' + content_type.split('/')[1]
+            pic_file_path = PicFileHandle.path_join(mid_pic_folder_path, mid_pic_name)
 
-            start_time = datetime.datetime.now()          
-            img_contents = requests.get(url).content
             with open(pic_file_path, 'wb') as f_pics:
                 f_pics.write(img_contents)
-                f_urls.write(url + '\n')
+                self.f_write_urls.write(url + '\n')
                 runing_time = datetime.datetime.now() - start_time
                 runing_time = str(runing_time.seconds) + '.' + str(runing_time.microseconds)[:2]  
                 self.pic_log(runing_time, os.path.split(pic_file_path)[1], url)
@@ -84,7 +89,7 @@ if __name__ == '__main__':
 
     que = queue.Queue()
 
-    title_urls = GetTitleUrls().return_title_urls(if_break=False)
+    title_urls = GetTitleUrls().return_title_urls(if_break=True)
     mid_log_path = PicFileHandle.get_logger_file_path()
 
     # 获取downloaded_urls文件的路径
@@ -93,7 +98,7 @@ if __name__ == '__main__':
     downloaded_urls = PicFileHandle.get_downloaded_urls()
 
     for title_url in title_urls:
-        pic_info = GetPicInfoInTitlePages().return_pic_info(title_url, if_break=False)
+        pic_info = GetPicInfoInTitlePages().return_pic_info(title_url, if_break=True)
 
         pic_explain = pic_info.get('pic_explain', 'None_Pic_Explain_' + NOW_TIME)
         pic_title = pic_info.get('pic_title', 'None_Pic_Title_' + NOW_TIME)
@@ -107,24 +112,24 @@ if __name__ == '__main__':
 
         for k in pic_info:
             if k not in ('pic_explain', 'pic_title') and k not in downloaded_urls:
-                mid_pic_file_path = PicFileHandle.get_pic_file_path(
-                    k, pic_info[k], pic_folder_path)
-                que.put((k, mid_pic_file_path))
-        
-        break
+                # mid_pic_file_path = PicFileHandle.get_pic_file_path(
+                #     k, pic_info[k], pic_folder_path)
+                que.put((k, pic_info[k], pic_folder_path))
+
+                break
     
     # 关于这个循环放在for k in pic_info外面的解释
     # 当这个循环在里面时,每个循环,都会创建五个线程,造成线程超多
     # 20181115_171927 我不确定为什么下载完的线程为什么没结束
-    with open(downloaded_urls_path, 'a', encoding='utf-8') as f_urls:
+    with open(downloaded_urls_path, 'a', encoding='utf-8') as f:
         for _ in range(5):
-            t = DownloadPicByThreading(que, mid_log_path, f_urls)
+            t = DownloadPicByThreading(que, mid_log_path, f)
             t.setDaemon(True)
             t.start()
 
         que.join()
     
-    print('program end')
+    print('Program End')
 
 
 
