@@ -12,6 +12,7 @@ import os
 import re
 import datetime
 import warnings
+import sys
 
 from get_config import GetConfig
 
@@ -27,7 +28,16 @@ class PicFileHandle():
         处理此程序中关于路径的类
     """
 
-    __root_folder_path = GetConfig.get_config()['root_folder_path']
+    platform = sys.platform
+
+    if platform == 'win32':
+        root_folder_flag = 'windows_root_folder_path'
+    elif platform == 'linux':
+        root_folder_flag = 'linux_root_folder_path'
+    else:
+        raise EnvironmentError('未知系统')
+
+    __root_folder_path = GetConfig.get_config()[root_folder_flag]
 
     def __init__(self):
         pass
