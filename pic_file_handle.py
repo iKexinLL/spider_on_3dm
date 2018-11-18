@@ -35,7 +35,8 @@ class PicFileHandle():
     @staticmethod
     def replace_invalid_char(path):
         r"""剔除windows路径或文件上的非法字符
-           规则: r'//*|\*|\?|"|<|>|\||\u3000'
+           规则: ？|//*|\*|\?|"|<|>|\||\u3000
+                取前50个字符
         
         Parameters
         ----------
@@ -48,8 +49,8 @@ class PicFileHandle():
             剔除后的路径
         """
 
-        re_compile = re.compile(r'//*|\*|\?|"|<|>|\||\u3000')
-        return re.sub(re_compile, '_', path)
+        re_compile = re.compile(r'？|//*|\*|\?|"|<|>|\||\u3000')
+        return re.sub(re_compile, '_', path)[:50]
 
     @staticmethod
     def create_folder(path):
