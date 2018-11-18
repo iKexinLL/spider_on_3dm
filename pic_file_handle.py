@@ -51,7 +51,7 @@ class PicFileHandle():
         """
 
         re_compile = re.compile(r'？|//*|\*|\?|"|<|>|\||\u3000')
-        print('path in replace_invalid_char is ' + path)
+        # print('path in replace_invalid_char is ' + path)
         # return re.sub(re_compile, '_', path)
 
         # 假定路径为文件夹或者文件
