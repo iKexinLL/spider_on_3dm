@@ -125,14 +125,16 @@ class GetPicInfoInTitlePages(GetTitleUrls):
         log = LogginInfoOnlyStream()
         log.info('getting pic url from title: ' + url)
 
-    def return_pic_info(self, url=r'https://www.3dmgame.com/bagua/540.html', if_break=False):
+    def return_pic_info(self, url=r'https://www.3dmgame.com/bagua/540.html', 
+                        if_test_programm='false'):
         """返回pic的信息,网址以及名称
         
         Parameters
         ----------
         url : regexp, optional
             title网址 (the default is r'https://www.3dmgame.com/bagua/540.html', which 默认测试的title网址)
-        if_break : bool, optional
+        if_test_programm : str, optional
+            注意,这里只可填写 true 和 false
             减少循环,方便对程序进行测试 (the default is False, which 不循环)
         Returns
         -------
@@ -150,14 +152,14 @@ class GetPicInfoInTitlePages(GetTitleUrls):
             res_d.update(self.get_pic_url_and_info(soup))
             self.sleep_program.sleep(1)
             url = self.get_next_page(soup)
-            if if_break:
+            if if_test_programm == 'true':
                 break
             
         return res_d
 
 
 if __name__ == '__main__':
-    tp = GetPicInfoInTitlePages().return_pic_info(if_break=True)
+    tp = GetPicInfoInTitlePages().return_pic_info(if_test_programm='true')
     print(tp)
     # tp = {'pic_explain': '周一来临，快来欣赏云飞系列的新内涵囧图。美女姿势诱惑，你们有大胆的想法吗？\
     # 救人一命胜造七级浮屠，妹子这么痛苦就让我来帮忙吧！小姐姐胸前的字太霸气，是男人都蠢蠢欲动。大叔看到什么吓成这样，难道是被性感美女吓坏了？', 
