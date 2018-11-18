@@ -100,6 +100,11 @@ class PicFileHandle():
     @staticmethod
     def path_join(path, *paths):
         """同os.path.join,合并N个路径
+           20181118_193554 
+           这个方法有很大的问题
+           比如,在如果传入的path本身就是一个路径,当调用replace_invalid_char()的时候
+           会把原有路径中的正反斜杠给替换掉
+           所以,正确的写法是直接调用os.path.join(),在需要的地方调用replace_invalid_char()
         
         Parameters
         ----------
@@ -112,6 +117,7 @@ class PicFileHandle():
             合并后的路径
         """
 
+        warnings.warn('此方法作废,因为造成正确的地址中的正反斜杠变为下划线')
         fisrt_path = PicFileHandle.replace_invalid_char(path)
         other_paths = []
         for tmp_path in paths:
@@ -165,7 +171,8 @@ class PicFileHandle():
         """
 
         # root_folder_path = PicFileHandle.get_root_folder_path()
-        pic_folder_path = PicFileHandle.path_join(
+        pic_title = PicFileHandle.replace_invalid_char(pic_title)
+        pic_folder_path = os.path.join(
             PicFileHandle.__root_folder_path, NOW_DATE, pic_title)
 
         return pic_folder_path
@@ -199,8 +206,8 @@ class PicFileHandle():
 
         warnings.warn('此方法作废,因为可能无法正确获取图片的后缀')
         suffix_name = '.' + url.rsplit('.', 1)[1]
-        pic_name = prefix_name + suffix_name
-        return PicFileHandle.path_join(pic_folder_path, pic_name)
+        pic_name = os.path.join(pic_folder_path, prefix_name + suffix_name)
+        return pic_name
 
     @staticmethod
     def get_logger_file_path():
@@ -213,7 +220,7 @@ class PicFileHandle():
         """
 
         # root_folder_path = PicFileHandle.get_root_folder_path()
-        pic_logger_path = PicFileHandle.path_join(
+        pic_logger_path = os.path.join(
             PicFileHandle.__root_folder_path, NOW_DATE, 'LOG', 'pic_log_%s.log'%NOW_TIME)
         PicFileHandle.create_folder(os.path.split(pic_logger_path)[0])
         return pic_logger_path
@@ -228,7 +235,7 @@ class PicFileHandle():
             downloaded_urls.txt的路径
         """
 
-        return PicFileHandle.path_join(
+        return os.path.join(
             PicFileHandle.__root_folder_path, 'downloaded_urls.txt')
         
     @staticmethod
@@ -275,7 +282,8 @@ class PicFileHandle():
             pic的根目录
         
         """
-        mid_path = PicFileHandle.path_join(pic_folder_path, 'pic_explain.txt')
+        pic_folder_path = PicFileHandle.replace_invalid_char(pic_folder_path)
+        mid_path = os.path.join(pic_folder_path, 'pic_explain.txt')
         with open(mid_path, 'w', encoding='utf-8') as f:
             f.write(title_url + '\n')
             f.write(pic_explain)

@@ -56,8 +56,13 @@ class DownloadPicByThreading(threading.Thread):
             r = requests.get(url)
             img_contents = r.content
             content_type = r.headers['Content-Type']
+
+            mid_pic_folder_path = PicFileHandle.replace_invalid_char(mid_pic_folder_path)
+            
+            mid_pic_name = PicFileHandle.replace_invalid_char(mid_pic_name)
             mid_pic_name = mid_pic_name + '.' + content_type.split('/')[1]
-            pic_file_path = PicFileHandle.path_join(mid_pic_folder_path, mid_pic_name)
+
+            pic_file_path = os.path.join(mid_pic_folder_path, mid_pic_name)
 
             # 添加子线程的异常处理
             try:
