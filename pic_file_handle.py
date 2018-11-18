@@ -282,7 +282,6 @@ class PicFileHandle():
             pic的根目录
         
         """
-        pic_folder_path = PicFileHandle.replace_invalid_char(pic_folder_path)
         mid_path = os.path.join(pic_folder_path, 'pic_explain.txt')
         with open(mid_path, 'w', encoding='utf-8') as f:
             f.write(title_url + '\n')
