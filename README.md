@@ -33,7 +33,7 @@
 - [x] 将pic网址写入downloaded_urls.txt,防止下次重复下载
 - [x] 为pic文件名称添加位置标识(页数_排名_pic文件名)
 - [ ] 每天定时执行
-- [ ] 在Debian(Raspberry)上部署
+- [x] 在Debian(Raspberry)上部署
 - [ ] 添加重连方法(?未确定)
 - [x] 给程序添加StreamHandler,在控制台中了解程序状态(完成50%)
-- [ ] 子进程报错问题,需要传递给主进程
+- [x] 子进程报错问题,需要传递给主进程
